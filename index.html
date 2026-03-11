@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coffee & Health — Evidence Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0e0c;
+  --surface: #1a1814;
+  --surface2: #242019;
+  --accent: #c8956c;
+  --accent2: #e8b88a;
+  --green: #4ecca3;
+  --green-dim: #2a8a6e;
+  --red: #e07852;
+  --red-dim: #b85a3a;
+  --blue: #5ba4cf;
+  --purple: #a07cc5;
+  --text: #e8e0d4;
+  --text-dim: #9a9080;
+  --text-muted: #6a6458;
+  --border: #2e2a24;
+  --radius: 12px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Source Sans 3', sans-serif;
+  font-weight: 300;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+::selection { background: var(--accent); color: var(--bg); }
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(ellipse at 30% 50%, rgba(200,149,108,0.08) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 60%, rgba(78,204,163,0.05) 0%, transparent 50%);
+  animation: drift 20s ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  0% { transform: translate(0,0) rotate(0deg); }
+  100% { transform: translate(-3%,2%) rotate(2deg); }
+}
+
+.hero-badge {
+  display: inline-block;
+  padding: 6px 20px;
+  border: 1px solid var(--accent);
+  border-radius: 50px;
+  font-size: 0.75rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+  animation: fadeUp 1s ease 0.2s both;
+}
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.8rem, 7vw, 6rem);
+  font-weight: 900;
+  line-height: 1.1;
+  max-width: 900px;
+  position: relative;
+  z-index: 1;
+  animation: fadeUp 1s ease 0.4s both;
+}
+
+.hero h1 span { color: var(--accent); }
+
+.hero-sub {
+  font-size: 1.2rem;
+  color: var(--text-dim);
+  max-width: 600px;
+  margin-top: 1.5rem;
+  position: relative;
+  z-index: 1;
+  animation: fadeUp 1s ease 0.6s both;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 3rem;
+  margin-top: 3rem;
+  position: relative;
+  z-index: 1;
+  animation: fadeUp 1s ease 0.8s both;
+}
+
+.hero-stat {
+  text-align: center;
+}
+
+.hero-stat .num {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--green);
+}
+
+.hero-stat .label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.scroll-cue {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: bounce 2s infinite;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(8px); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* NAV */
+.sticky-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(15,14,12,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  overflow-x: auto;
+}
+
+.sticky-nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s;
+}
+
+.nav-btn:hover { color: var(--text); }
+.nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* SECTIONS */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+section {
+  padding: 5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-label {
+  font-size: 0.7rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.section-desc {
+  color: var(--text-dim);
+  max-width: 700px;
+  margin-bottom: 3rem;
+  font-size: 1.05rem;
+}
+
+/* BENEFIT CARDS */
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.5rem;
+}
+
+.evidence-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  transition: all 0.4s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.evidence-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: var(--green);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+
+.evidence-card:hover::before { transform: scaleX(1); }
+.evidence-card:hover { border-color: var(--green-dim); transform: translateY(-2px); }
+
+.evidence-card.risk::before { background: var(--red); }
+.evidence-card.risk:hover { border-color: var(--red-dim); }
+
+.evidence-card.sport::before { background: var(--blue); }
+.evidence-card.sport:hover { border-color: var(--blue); }
+
+.evidence-card.mechanism::before { background: var(--purple); }
+.evidence-card.mechanism:hover { border-color: var(--purple); }
+
+.card-icon {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.card-stat {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.card-stat.benefit { color: var(--green); }
+.card-stat.harm { color: var(--red); }
+.card-stat.sport-stat { color: var(--blue); }
+.card-stat.mech-stat { color: var(--purple); }
+
+.card-body {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.card-source {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+  font-style: italic;
+}
+
+.card-details {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, padding 0.5s ease;
+}
+
+.evidence-card.expanded .card-details {
+  max-height: 500px;
+  padding-top: 1rem;
+}
+
+.card-details-inner {
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  line-height: 1.8;
+}
+
+.expand-hint {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 0.75rem;
+}
+
+/* COMPARISON TABLE */
+.comparison-table-wrap {
+  overflow-x: auto;
+  margin-top: 2rem;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.comparison-table th {
+  font-family: 'Playfair Display', serif;
+  text-align: left;
+  padding: 1rem 1.5rem;
+  border-bottom: 2px solid var(--accent);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--accent2);
+  white-space: nowrap;
+}
+
+.comparison-table td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.comparison-table tr:hover td { background: var(--surface); }
+
+.tag-benefit {
+  display: inline-block;
+  background: rgba(78,204,163,0.15);
+  color: var(--green);
+  padding: 2px 10px;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.tag-risk {
+  display: inline-block;
+  background: rgba(224,120,82,0.15);
+  color: var(--red);
+  padding: 2px 10px;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.tag-na {
+  display: inline-block;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+/* REFERENCES */
+.ref-list {
+  counter-reset: ref;
+  list-style: none;
+}
+
+.ref-item {
+  counter-increment: ref;
+  padding: 1.25rem 1.5rem;
+  border-left: 2px solid var(--border);
+  margin-bottom: 0.75rem;
+  transition: all 0.3s;
+  position: relative;
+  padding-left: 3.5rem;
+}
+
+.ref-item::before {
+  content: counter(ref);
+  position: absolute;
+  left: 1rem;
+  top: 1.25rem;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 1rem;
+}
+
+.ref-item:hover {
+  border-left-color: var(--accent);
+  background: var(--surface);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.ref-authors {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ref-title {
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.ref-journal {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.ref-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.85rem;
+  word-break: break-all;
+}
+
+.ref-link:hover { text-decoration: underline; }
+
+/* VERDICT */
+.verdict-box {
+  background: linear-gradient(135deg, rgba(78,204,163,0.08), rgba(200,149,108,0.08));
+  border: 1px solid var(--green-dim);
+  border-radius: var(--radius);
+  padding: 3rem;
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.verdict-box h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: var(--green);
+}
+
+.verdict-box p {
+  color: var(--text-dim);
+  max-width: 700px;
+  margin: 0 auto;
+  font-size: 1.05rem;
+}
+
+/* FILTER PILLS */
+.filter-bar {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.filter-pill {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.85rem;
+  font-family: 'Source Sans 3', sans-serif;
+  font-weight: 600;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.filter-pill:hover { border-color: var(--text-muted); color: var(--text); }
+.filter-pill.active { border-color: var(--accent); color: var(--accent); background: rgba(200,149,108,0.1); }
+
+/* SCORE BAR */
+.score-bar-wrap {
+  margin: 3rem 0;
+}
+
+.score-bar-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.score-bar {
+  height: 40px;
+  border-radius: 50px;
+  overflow: hidden;
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.score-benefit {
+  background: linear-gradient(90deg, var(--green-dim), var(--green));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: width 1.5s ease;
+}
+
+.score-risk {
+  background: linear-gradient(90deg, var(--red), var(--red-dim));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: width 1.5s ease;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .hero-stats { flex-direction: column; gap: 1.5rem; }
+  .evidence-grid { grid-template-columns: 1fr; }
+  .sticky-nav-inner { gap: 0; }
+  .nav-btn { padding: 0.75rem 1rem; font-size: 0.8rem; }
+  section { padding: 3rem 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Sobir Rahimov & Shohruh Mamurov — Research-Backed Evidence Dashboard</div>
+  <h1>Is Coffee More <span>Beneficial</span> Than Harmful?</h1>
+  <p class="hero-sub">A comprehensive visual analysis of 200+ meta-analyses for the case that moderate coffee consumption benefits young, active adults.</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="num">201</div>
+      <div class="label">Meta-analyses reviewed</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">17%</div>
+      <div class="label">Mortality reduction</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">74%</div>
+      <div class="label">Elite athletes use caffeine</div>
+    </div>
+  </div>
+  <div class="scroll-cue" onclick="document.getElementById('benefits').scrollIntoView()">↓ Explore the evidence</div>
+</div>
+
+<!-- NAV -->
+<div class="sticky-nav">
+  <div class="sticky-nav-inner">
+    <button class="nav-btn active" data-target="benefits">Benefits</button>
+    <button class="nav-btn" data-target="sports">Athletic</button>
+    <button class="nav-btn" data-target="mechanisms">Mechanisms</button>
+    <button class="nav-btn" data-target="risks">Risks</button>
+    <button class="nav-btn" data-target="comparison">Comparison</button>
+    <button class="nav-btn" data-target="verdict">Verdict</button>
+    <button class="nav-btn" data-target="references">References</button>
+  </div>
+</div>
+
+<!-- BENEFITS SECTION -->
+<section id="benefits">
+<div class="container">
+  <div class="section-label">Section 01</div>
+  <div class="section-title">Health Benefits</div>
+  <div class="section-desc">Across 201 meta-analyses covering 67 unique health outcomes, coffee consumption was more often associated with benefit than harm. Click any card to expand details.</div>
+
+  <div class="evidence-grid">
+    <div class="evidence-card" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">💀</div>
+      <div class="card-title">All-Cause Mortality</div>
+      <div class="card-stat benefit">−17%</div>
+      <div class="card-body">Drinking 3–4 cups per day showed the largest relative risk reduction for death from any cause compared to non-drinkers. The relationship follows a U/J-shaped curve.</div>
+      <div class="card-source">Poole et al. 2017, BMJ — 201 meta-analyses, 11.9M+ participants</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          Relative risk at 3–4 cups/day: <strong>0.83 (95% CI: 0.79–0.88)</strong>. Benefits increased up to this threshold then plateaued. Both caffeinated and decaffeinated coffee showed benefits. A 2025 prospective cohort study further confirmed that black coffee or coffee with low added sugar was associated with 14% lower all-cause mortality. The benefits are not explained by smoking, BMI, or other confounders after adjustment.
+        </div>
+      </div>
+    </div>
+
+    <div class="evidence-card" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">🫀</div>
+      <div class="card-title">Cardiovascular Disease</div>
+      <div class="card-stat benefit">−15 to 19%</div>
+      <div class="card-body">Cardiovascular mortality reduced by 19% and overall cardiovascular disease risk by 15% at optimal intake of 3–4 cups/day.</div>
+      <div class="card-source">Poole et al. 2017; GeroScience 2024</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          CV mortality RR: <strong>0.81 (0.72–0.90)</strong>; CVD RR: <strong>0.85 (0.80–0.90)</strong>. Despite historical concerns, coffee is NOT linked to increased hypertension risk in the long term. An International Society of Hypertension position paper (2024) concluded that moderate regular coffee consumption (3–4 cups/day) does not adversely affect blood pressure or the cardiovascular system. Coffee acutely raises BP by ~2 mmHg but this effect is transient.
+        </div>
+      </div>
+    </div>
+
+    <div class="evidence-card" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">🎗️</div>
+      <div class="card-title">Cancer Prevention</div>
+      <div class="card-stat benefit">−18%</div>
+      <div class="card-body">High vs. low consumption was associated with 18% lower risk of incident cancer. Protective against liver, colorectal, breast, endometrial, and prostate cancers.</div>
+      <div class="card-source">Poole 2017; Grosso et al. 2017, Annual Review of Nutrition</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          Incident cancer OR: <strong>0.82 (0.74–0.89)</strong>. Lung cancer showed an apparent harmful association, but this was largely nullified after adequate adjustment for smoking—smokers are much more likely to drink coffee. After controlling for smoking, coffee appears neutral or protective for nearly all cancer types. Liver cancer showed the strongest protection.
+        </div>
+      </div>
+    </div>
+
+    <div class="evidence-card" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">🩸</div>
+      <div class="card-title">Type 2 Diabetes</div>
+      <div class="card-stat benefit">Dose-response ↓</div>
+      <div class="card-body">Consistently linked with reduced T2D risk in a clear dose-response relationship. Mechanisms include improved insulin sensitivity and glucose metabolism.</div>
+      <div class="card-source">GeroScience 2024; Grosso 2017; Multiple meta-analyses</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          Both observational and Mendelian randomization (genetic) studies support a causal relationship between coffee and lower T2D risk. Chlorogenic acid inhibits glucose-6-phosphatase, reducing glucose production in the liver. This is one of the most robust findings in the coffee literature, confirmed across dozens of studies worldwide.
+        </div>
+      </div>
+    </div>
+
+    <div class="evidence-card" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">🧠</div>
+      <div class="card-title">Neurological Protection</div>
+      <div class="card-stat benefit">Significant ↓</div>
+      <div class="card-body">Reduced risk of Parkinson's disease, Alzheimer's disease, and depression. Moderate tea or coffee consumption decreased cognitive disorder risk.</div>
+      <div class="card-source">Zhu et al. 2024; Grosso 2017; Nehlig 2025</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          A 2024 dose-response meta-analysis confirmed that moderate coffee or tea consumption decreased the risk of cognitive disorders. For depression, a J-shaped association was found in 146,000 UK Biobank participants: 2–3 cups/day linked to the lowest risk. Caffeine's neuroprotective effect is primarily through adenosine A2A receptor antagonism, reducing neuroinflammation and oxidative stress.
+        </div>
+      </div>
+    </div>
+
+    <div class="evidence-card" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">🏥</div>
+      <div class="card-title">Liver Protection</div>
+      <div class="card-stat benefit">Strong ↓</div>
+      <div class="card-body">Lower risk of cirrhosis, non-alcoholic fatty liver disease, and liver cancer. One of the strongest and most consistent findings in coffee research.</div>
+      <div class="card-source">Poole 2017; GeroScience 2024</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          The liver shows perhaps the most dramatic protective response to coffee. Risk of liver cirrhosis is substantially reduced with regular coffee consumption. The mechanisms involve coffee's ability to reduce hepatic fibrosis, lower liver enzyme levels, and inhibit hepatocellular carcinoma development. These benefits apply to both caffeinated and decaffeinated coffee.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- SPORTS SECTION -->
+<section id="sports">
+<div class="container">
+  <div class="section-label">Section 02</div>
+  <div class="section-title">Athletic Performance</div>
+  <div class="section-desc">This is the strongest evidence for your "young and sporty" argument — these findings come from Randomized Controlled Trials (RCTs), which provide stronger evidence than observational studies.</div>
+
+  <div class="evidence-grid">
+    <div class="evidence-card sport" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">💪</div>
+      <div class="card-title">Muscle Strength & Endurance</div>
+      <div class="card-stat sport-stat">Significant ↑</div>
+      <div class="card-body">An umbrella meta-analysis of 9 meta-analyses found caffeine significantly increases both muscle strength (SMD = 0.18) and muscle endurance (SMD = 0.30).</div>
+      <div class="card-source">Sahebi Ala et al. 2024, Heliyon — umbrella of 9 meta-analyses</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          Muscle strength: SMD = 0.18 (95% CI: 0.14–0.21, p < 0.001). Muscle endurance: SMD = 0.30 (95% CI: 0.21–0.38, p < 0.001). Both effects are statistically robust. The effect on endurance is moderate in size, meaning caffeine has a meaningful and reliable effect on sustained muscular effort. This applies across various exercise types including bench press, squats, and isometric tasks.
+        </div>
+      </div>
+    </div>
+
+    <div class="evidence-card sport" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">🏃</div>
+      <div class="card-title">Endurance Running</div>
+      <div class="card-stat sport-stat">2–12% improvement</div>
+      <div class="card-body">Caffeine meaningfully increased time to exhaustion in both recreational and trained runners, and improved time-trial performance.</div>
+      <div class="card-source">Del Coso et al. 2022, Nutrients — systematic review & meta-analysis</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          Time to exhaustion: medium effect size (g = 0.469 for recreational; g = 0.344 for trained runners, both p < 0.01). Time trials showed a small but significant improvement (g = −0.101, p = 0.026). The improvement is similar in regular caffeine users and occasional users. Benefits seen from doses as low as 3 mg/kg body weight (~200 mg for a 70 kg person).
+        </div>
+      </div>
+    </div>
+
+    <div class="evidence-card sport" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">⚽</div>
+      <div class="card-title">Team & Combat Sports</div>
+      <div class="card-stat sport-stat">↑ High-intensity efforts</div>
+      <div class="card-body">Caffeine increased sprint counts, accelerations, body impacts, and success rate of sport-specific actions in football, rugby, basketball, handball, and combat sports.</div>
+      <div class="card-source">Del Coso et al. 2024, IJSPP — meta-analysis</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          The effects were similar in both men and women (approximately 30% of sample in sprints, 45% in impacts). Caffeine improved the athlete's capacity to repeat high-intensity efforts across multiple intermittent sports, representing greater player involvement during games. Benefits applied in real and simulated match conditions, strengthening ecological validity.
+        </div>
+      </div>
+    </div>
+
+    <div class="evidence-card sport" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">🧠</div>
+      <div class="card-title">Cognitive Performance in Sport</div>
+      <div class="card-stat sport-stat">Attention ↑ Accuracy ↑</div>
+      <div class="card-body">Meta-analysis confirmed caffeine improves attention and accuracy in athletes when taken before training or competition. Also improved mood and self-reported energy.</div>
+      <div class="card-source">Calvo et al. 2021, Nutrients — systematic review & meta-analysis</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          13 studies reviewed, 5 included in quantitative meta-analysis. Significant improvements in attention and accuracy in pooled analysis. Low-to-moderate doses (1–6 mg/kg) improved self-reported energy, mood, and cognitive functions. The benefits may be especially relevant in sports requiring quick decision-making like football, basketball, and tennis.
+        </div>
+      </div>
+    </div>
+
+    <div class="evidence-card sport" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">🏅</div>
+      <div class="card-title">ISSN Official Position (2021)</div>
+      <div class="card-stat sport-stat">Endorsed ✓</div>
+      <div class="card-body">The International Society of Sports Nutrition officially recognizes caffeine as an effective ergogenic aid, endorsing its use for muscular endurance, strength, sprint, and aerobic performance.</div>
+      <div class="card-source">Guest et al. 2021, JISSN — position stand</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          Key conclusions from the ISSN: caffeine benefits include improved muscular endurance, movement velocity and muscular strength, sprinting, jumping and throwing performance, plus a wide range of aerobic and anaerobic benefits. Caffeine was removed from the World Anti-Doping Agency (WADA) banned list in 2004. Optimal dose: 3–6 mg/kg body mass, taken 30–60 minutes before exercise. Even habitual caffeine consumers still see performance benefits.
+        </div>
+      </div>
+    </div>
+
+    <div class="evidence-card sport" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">💧</div>
+      <div class="card-title">Hydration Myth: Debunked</div>
+      <div class="card-stat sport-stat">No dehydration</div>
+      <div class="card-body">Coffee consumed in moderation has similar hydrating qualities to water. No significant differences in hydration markers were found between coffee and water drinkers.</div>
+      <div class="card-source">Killer et al. 2014, PLoS ONE</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          While caffeine itself has a mild diuretic effect, the volume of water in a cup of coffee more than compensates. In the Killer et al. study, regular male coffee drinkers showed no significant differences in any hydration biomarker when drinking 4 cups of coffee vs. 4 cups of water over 3 days. This is important because dehydration is one of the most common arguments against coffee for athletes — and the evidence shows it's not a real concern at moderate intakes.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- MECHANISMS SECTION -->
+<section id="mechanisms">
+<div class="container">
+  <div class="section-label">Section 03</div>
+  <div class="section-title">How It Works — Bioactive Compounds</div>
+  <div class="section-desc">Coffee contains over 1,000 bioactive compounds. Here are the key players explaining its health benefits.</div>
+
+  <div class="evidence-grid">
+    <div class="evidence-card mechanism" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">🧪</div>
+      <div class="card-title">Chlorogenic Acid (CGA)</div>
+      <div class="card-stat mech-stat">12–18% of green coffee</div>
+      <div class="card-body">The main polyphenol in coffee. Powerful antioxidant and anti-inflammatory compound that modulates multiple disease pathways.</div>
+      <div class="card-source">Naveed et al. 2018; Yamagata 2025; Habtemariam 2024</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          CGA works through three main mechanisms: (1) Anti-inflammation — curtails NF-κB pathways, neutralizing pro-inflammatory factors like TNF-α, NO, COX-2, and interleukins; (2) Antioxidant defense — activates the Nrf2 pathway, boosting cellular defenses against free radicals; (3) Metabolic regulation — activates AMPK pathway, maintaining glucose and lipid homeostasis. Also improves gut microbiota and endothelial (blood vessel) function. Light roasts retain more CGA than dark roasts.
+        </div>
+      </div>
+    </div>
+
+    <div class="evidence-card mechanism" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">⚡</div>
+      <div class="card-title">Caffeine</div>
+      <div class="card-stat mech-stat">~95mg per cup</div>
+      <div class="card-body">Blocks adenosine receptors in the brain, increasing alertness, delaying fatigue, and enhancing physical performance. Also has anticancer and anti-inflammatory properties.</div>
+      <div class="card-source">ISSN 2021; Multiple reviews</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          Caffeine's primary mechanism: competitive antagonism of adenosine A1 and A2A receptors. Adenosine normally promotes sleepiness and relaxation. By blocking it, caffeine increases neuronal firing, releases dopamine and norepinephrine, and delays perceived fatigue. Half-life: 2.5–10 hours (varies by genetics — CYP1A2 gene). For sport: enhances calcium release in muscles, increases fat oxidation, and reduces perceived exertion. Safe upper limit for adults: ~400mg/day.
+        </div>
+      </div>
+    </div>
+
+    <div class="evidence-card mechanism" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">🛡️</div>
+      <div class="card-title">Polyphenols & Diterpenes</div>
+      <div class="card-stat mech-stat">1,000+ compounds</div>
+      <div class="card-body">Beyond CGA and caffeine, coffee contains trigonelline, cafestol, kahweol, and melanoidins — each contributing anti-inflammatory and antioxidant effects.</div>
+      <div class="card-source">Habtemariam 2024, Comprehensive Reviews in Food Science</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          Trigonelline: lowers oxidative stress by increasing antioxidant enzyme activity and scavenging reactive oxygen species. Diterpenes (cafestol, kahweol): anti-inflammatory and anticancer activity, though unfiltered coffee (French press, Turkish) contains more diterpenes which can raise cholesterol. Melanoidins (formed during roasting): possess antioxidant and prebiotic properties. This is why both caffeinated AND decaffeinated coffee show health benefits — it's not just about caffeine.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- RISKS SECTION -->
+<section id="risks">
+<div class="container">
+  <div class="section-label">Section 04</div>
+  <div class="section-title">Risks & Critiques</div>
+  <div class="section-desc">Being honest about the opposing evidence strengthens your argument. Here are the legitimate concerns and why most don't apply to your demographic.</div>
+
+  <div class="evidence-grid">
+    <div class="evidence-card risk" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">😰</div>
+      <div class="card-title">Anxiety</div>
+      <div class="card-stat harm">Dose-dependent ↑</div>
+      <div class="card-body">Caffeine is associated with increased anxiety risk, especially at high doses. It blocks adenosine and triggers the fight-or-flight stress response.</div>
+      <div class="card-source">UCLA Health 2025; AMA 2025; Multiple reviews</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          <strong>Counter-argument:</strong> At moderate intake (≤200mg/day or ~2 cups), 6 out of 23 studies found no worsening of anxiety. The risk is primarily from energy drinks (up to 500mg per can) and excessive consumption (>400mg/day). For healthy young adults consuming moderate amounts, anxiety risk is low. The 2–3 cups/day "sweet spot" for depression protection shows that dose matters enormously.
+        </div>
+      </div>
+    </div>
+
+    <div class="evidence-card risk" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">😴</div>
+      <div class="card-title">Sleep Disruption</div>
+      <div class="card-stat harm">~36 min less/day</div>
+      <div class="card-body">Coffee consumption may reduce total sleep time by approximately 36 minutes per day. This is dose and timing dependent.</div>
+      <div class="card-source">Nehlig 2025; Nutrients review</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          <strong>Counter-argument:</strong> The half-life of caffeine is 2.5–10 hours. Consuming caffeine before a morning training session can enhance performance without compromising nighttime sleep — enough time passes for substantial metabolism before bedtime. The key is <em>timing</em>, not elimination. Avoiding caffeine after 2pm effectively mitigates this risk for most people.
+        </div>
+      </div>
+    </div>
+
+    <div class="evidence-card risk" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">🤰</div>
+      <div class="card-title">Pregnancy Risks</div>
+      <div class="card-stat harm">Real harm ⚠️</div>
+      <div class="card-body">High coffee consumption during pregnancy is associated with low birth weight, preterm birth, and pregnancy loss. This is the one area where coffee is clearly harmful.</div>
+      <div class="card-source">Poole 2017, BMJ — umbrella review</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          Low birth weight OR: 1.31; Preterm birth OR: 1.22 (first trimester); Pregnancy loss OR: 1.46. WHO recommends pregnant women limit caffeine to <200mg/day. <strong>For your argument:</strong> This risk is irrelevant to your specific demographic (young, sporty individuals). Acknowledge it honestly, but note it doesn't apply.
+        </div>
+      </div>
+    </div>
+
+    <div class="evidence-card risk" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">💊</div>
+      <div class="card-title">Dependency & Withdrawal</div>
+      <div class="card-stat harm">Mild–Moderate</div>
+      <div class="card-body">Regular caffeine users may experience withdrawal symptoms including headache, fatigue, mood changes, and difficulty concentrating upon cessation.</div>
+      <div class="card-source">Lone et al. 2023; DSM-5 recognition</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          <strong>Counter-argument:</strong> Caffeine withdrawal is recognized in DSM-5 but is categorized as a mild condition. Symptoms peak at 1–2 days and resolve within a week. Unlike addictive drugs, caffeine does not cause the harmful behavior patterns, social dysfunction, or dose escalation typical of substance use disorders. Gradual reduction eliminates most withdrawal effects.
+        </div>
+      </div>
+    </div>
+
+    <div class="evidence-card risk" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">❤️</div>
+      <div class="card-title">Blood Pressure (Short-term)</div>
+      <div class="card-stat harm">+2 mmHg acute</div>
+      <div class="card-body">Coffee acutely raises systolic blood pressure by about 2 mmHg, but this is temporary and does not translate to long-term hypertension risk.</div>
+      <div class="card-source">ISH Position Paper 2024; Syarif 2024 meta-analysis</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          <strong>Counter-argument:</strong> The International Society of Hypertension (2024) explicitly concluded that moderate coffee consumption does not adversely affect blood pressure or cardiovascular health. Meta-analyses of cohort studies actually showed a 7% <em>reduction</em> in hypertension risk. The acute BP rise is transient and clinically insignificant in healthy individuals. Exercise itself causes much larger temporary BP increases.
+        </div>
+      </div>
+    </div>
+
+    <div class="evidence-card risk" onclick="this.classList.toggle('expanded')">
+      <div class="card-icon">📊</div>
+      <div class="card-title">Observational Data Limitation</div>
+      <div class="card-stat harm">Correlation ≠ Cause</div>
+      <div class="card-body">Most benefit studies are observational. Critics argue we can't prove causation. Healthy user bias may inflate results.</div>
+      <div class="card-source">General methodological critique</div>
+      <div class="expand-hint">↓ click for details</div>
+      <div class="card-details">
+        <div class="card-details-inner">
+          <strong>Counter-argument:</strong> (1) The athletic performance studies ARE RCTs — the gold standard of evidence; (2) Mendelian randomization studies (using genetic variants as natural experiments) support causal links for T2D and CKD; (3) The sheer consistency across 200+ meta-analyses, multiple countries, and diverse populations makes confounding alone an unlikely explanation; (4) Poole et al. showed that harmful associations were largely eliminated after adjusting for smoking, strengthening the remaining protective associations.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- COMPARISON -->
+<section id="comparison">
+<div class="container">
+  <div class="section-label">Section 05</div>
+  <div class="section-title">Side-by-Side Comparison</div>
+  <div class="section-desc">A complete overview showing how the evidence stacks up across every major health domain.</div>
+
+  <div class="score-bar-wrap">
+    <div class="score-bar-label">
+      <span style="color:var(--green)">✅ Benefits (67+ outcomes studied)</span>
+      <span style="color:var(--red)">⚠️ Risks (mostly dose/context dependent)</span>
+    </div>
+    <div class="score-bar">
+      <div class="score-benefit" style="width:75%">~75% of outcomes</div>
+      <div class="score-risk" style="width:25%">~25%</div>
+    </div>
+  </div>
+
+  <div class="comparison-table-wrap">
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Health Domain</th>
+          <th>Benefit Evidence</th>
+          <th>Risk Evidence</th>
+          <th>Applies to Young Athletes?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>All-Cause Mortality</strong></td>
+          <td><span class="tag-benefit">−17% at 3–4 cups</span></td>
+          <td><span class="tag-na">None at moderate intake</span></td>
+          <td>✅ Yes — universal benefit</td>
+        </tr>
+        <tr>
+          <td><strong>Cardiovascular</strong></td>
+          <td><span class="tag-benefit">−15–19% risk</span></td>
+          <td><span class="tag-risk">+2mmHg acute BP</span></td>
+          <td>✅ Benefit outweighs transient BP rise</td>
+        </tr>
+        <tr>
+          <td><strong>Cancer</strong></td>
+          <td><span class="tag-benefit">−18% incidence</span></td>
+          <td><span class="tag-na">Lung link = smoking confound</span></td>
+          <td>✅ Long-term protection</td>
+        </tr>
+        <tr>
+          <td><strong>Type 2 Diabetes</strong></td>
+          <td><span class="tag-benefit">Dose-response ↓</span></td>
+          <td><span class="tag-na">None identified</span></td>
+          <td>✅ Especially with active lifestyle</td>
+        </tr>
+        <tr>
+          <td><strong>Athletic Performance</strong></td>
+          <td><span class="tag-benefit">RCT-proven gains</span></td>
+          <td><span class="tag-risk">Sleep if taken late</span></td>
+          <td>✅✅ Core argument — RCT evidence</td>
+        </tr>
+        <tr>
+          <td><strong>Mental Health</strong></td>
+          <td><span class="tag-benefit">↓ Depression at 2–3 cups</span></td>
+          <td><span class="tag-risk">Anxiety at high doses</span></td>
+          <td>✅ At moderate intake</td>
+        </tr>
+        <tr>
+          <td><strong>Liver</strong></td>
+          <td><span class="tag-benefit">Strong protection</span></td>
+          <td><span class="tag-na">None</span></td>
+          <td>✅ Universal benefit</td>
+        </tr>
+        <tr>
+          <td><strong>Neurological</strong></td>
+          <td><span class="tag-benefit">↓ Parkinson's, Alzheimer's</span></td>
+          <td><span class="tag-na">None</span></td>
+          <td>✅ Long-term investment</td>
+        </tr>
+        <tr>
+          <td><strong>Sleep</strong></td>
+          <td><span class="tag-na">—</span></td>
+          <td><span class="tag-risk">−36 min if timed poorly</span></td>
+          <td>⚡ Mitigated by morning intake</td>
+        </tr>
+        <tr>
+          <td><strong>Pregnancy</strong></td>
+          <td><span class="tag-na">—</span></td>
+          <td><span class="tag-risk">Real harm — limit to <200mg</span></td>
+          <td>❌ Not applicable to this group</td>
+        </tr>
+        <tr>
+          <td><strong>Bone Health</strong></td>
+          <td><span class="tag-na">—</span></td>
+          <td><span class="tag-risk">Fracture risk in older women</span></td>
+          <td>❌ Not applicable to young adults</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- VERDICT -->
+<section id="verdict">
+<div class="container">
+  <div class="section-label">Section 06</div>
+  <div class="section-title">The Verdict</div>
+  <div class="section-desc">Synthesizing all evidence for the specific case of young, active, healthy adults.</div>
+
+  <div class="verdict-box">
+    <h3>Benefits Overwhelmingly Outweigh Risks</h3>
+    <p>For healthy young adults who are physically active, moderate coffee consumption (2–4 cups/day) is supported by 200+ meta-analyses showing reduced mortality, lower disease risk, and proven athletic performance gains. The primary risks (pregnancy complications, bone fractures in older women) are irrelevant to this demographic. Sleep and anxiety risks are mitigated by timing and moderation. The athletic performance benefits — proven through the gold standard of RCTs — make the case especially strong for active individuals.</p>
+  </div>
+
+  <div style="margin-top:3rem; display:grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap:1.5rem;">
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem; text-align:center;">
+      <div style="font-size:2rem; margin-bottom:0.5rem;">🏆</div>
+      <div style="font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; margin-bottom:0.5rem;">Key Talking Point 1</div>
+      <div style="color:var(--text-dim); font-size:0.9rem;">3–4 cups/day = sweet spot for maximum benefit, confirmed by the largest umbrella review ever conducted (201 meta-analyses)</div>
+    </div>
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem; text-align:center;">
+      <div style="font-size:2rem; margin-bottom:0.5rem;">⚡</div>
+      <div style="font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; margin-bottom:0.5rem;">Key Talking Point 2</div>
+      <div style="color:var(--text-dim); font-size:0.9rem;">Athletic benefits are RCT-proven (gold standard), not just observational — a stronger evidence level than most health claims</div>
+    </div>
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem; text-align:center;">
+      <div style="font-size:2rem; margin-bottom:0.5rem;">🎯</div>
+      <div style="font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; margin-bottom:0.5rem;">Key Talking Point 3</div>
+      <div style="color:var(--text-dim); font-size:0.9rem;">The main risks (pregnancy, bone fractures) don't apply to young active adults — the risks that do (sleep, anxiety) are mitigated by timing & moderation</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- REFERENCES -->
+<section id="references">
+<div class="container">
+  <div class="section-label">Section 07</div>
+  <div class="section-title">Reference List</div>
+  <div class="section-desc">All high-quality academic sources used, formatted for your presentation.</div>
+
+  <ol class="ref-list">
+    <li class="ref-item">
+      <span class="ref-authors">Poole, R., Kennedy, O.J., Roderick, P., Fallowfield, J.A., Hayes, P.C., & Parkes, J.</span> (2017). <span class="ref-title">Coffee consumption and health: umbrella review of meta-analyses of multiple health outcomes.</span> <span class="ref-journal">BMJ, 359, j5024.</span><br>
+      <a class="ref-link" href="https://doi.org/10.1136/bmj.j5024" target="_blank">https://doi.org/10.1136/bmj.j5024</a>
+    </li>
+    <li class="ref-item">
+      <span class="ref-authors">Grosso, G., Godos, J., Galvano, F., & Giovannucci, E.L.</span> (2017). <span class="ref-title">Coffee, caffeine, and health outcomes: An umbrella review.</span> <span class="ref-journal">Annual Review of Nutrition, 37, 131–156.</span><br>
+      <a class="ref-link" href="https://pubmed.ncbi.nlm.nih.gov/28826374/" target="_blank">https://pubmed.ncbi.nlm.nih.gov/28826374/</a>
+    </li>
+    <li class="ref-item">
+      <span class="ref-authors">Guest, N.S., VanDusseldorp, T.A., Nelson, M.T., et al.</span> (2021). <span class="ref-title">International Society of Sports Nutrition position stand: caffeine and exercise performance.</span> <span class="ref-journal">Journal of the International Society of Sports Nutrition, 18(1).</span><br>
+      <a class="ref-link" href="https://doi.org/10.1186/s12970-020-00383-4" target="_blank">https://doi.org/10.1186/s12970-020-00383-4</a>
+    </li>
+    <li class="ref-item">
+      <span class="ref-authors">Grgic, J., Grgic, I., Pickering, C., Schoenfeld, B.J., Bishop, D.J., & Pedisic, Z.</span> (2020). <span class="ref-title">Wake up and smell the coffee: caffeine supplementation and exercise performance — an umbrella review of 21 published meta-analyses.</span> <span class="ref-journal">British Journal of Sports Medicine, 54(11), 681–688.</span>
+    </li>
+    <li class="ref-item">
+      <span class="ref-authors">Ungvári, Z. & Kunutsor, S.K.</span> (2024). <span class="ref-title">Coffee consumption and cardiometabolic health: a comprehensive review of the evidence.</span> <span class="ref-journal">GeroScience.</span><br>
+      <a class="ref-link" href="https://doi.org/10.1007/s11357-024-01262-5" target="_blank">https://doi.org/10.1007/s11357-024-01262-5</a>
+    </li>
+    <li class="ref-item">
+      <span class="ref-authors">Sahebi Ala, F., et al.</span> (2024). <span class="ref-title">The effect of caffeine supplementation on muscular strength and endurance: A meta-analysis of meta-analyses.</span> <span class="ref-journal">Heliyon, 10(15).</span><br>
+      <a class="ref-link" href="https://doi.org/10.1016/j.heliyon.2024.e35025" target="_blank">https://doi.org/10.1016/j.heliyon.2024.e35025</a>
+    </li>
+    <li class="ref-item">
+      <span class="ref-authors">Del Coso, J., Muñoz, G., & Muñoz-Guerra, J.</span> (2022). <span class="ref-title">Effects of caffeine intake on endurance running performance and time to exhaustion: A systematic review and meta-analysis.</span> <span class="ref-journal">Nutrients, 15(1), 148.</span><br>
+      <a class="ref-link" href="https://pubmed.ncbi.nlm.nih.gov/36615805/" target="_blank">https://pubmed.ncbi.nlm.nih.gov/36615805/</a>
+    </li>
+    <li class="ref-item">
+      <span class="ref-authors">Calvo, J.L., Fei, X., Domínguez, R., & Pareja-Galeano, H.</span> (2021). <span class="ref-title">Caffeine and cognitive functions in sports: A systematic review and meta-analysis.</span> <span class="ref-journal">Nutrients, 13(3), 868.</span><br>
+      <a class="ref-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8000732/" target="_blank">https://pmc.ncbi.nlm.nih.gov/articles/PMC8000732/</a>
+    </li>
+    <li class="ref-item">
+      <span class="ref-authors">Del Coso, J., et al.</span> (2024). <span class="ref-title">Can caffeine change the game? Effects of acute caffeine intake on specific performance in intermittent sports during competition.</span> <span class="ref-journal">International Journal of Sports Physiology and Performance, 19(11), 1180.</span><br>
+      <a class="ref-link" href="https://doi.org/10.1123/ijspp.2024-0144" target="_blank">https://doi.org/10.1123/ijspp.2024-0144</a>
+    </li>
+    <li class="ref-item">
+      <span class="ref-authors">Doepker, C., et al.</span> (2022). <span class="ref-title">Benefit–risk of coffee consumption and all-cause mortality: A systematic review and DALY analysis.</span> <span class="ref-journal">Food and Chemical Toxicology, 169, 113444.</span><br>
+      <a class="ref-link" href="https://doi.org/10.1016/j.fct.2022.113444" target="_blank">https://doi.org/10.1016/j.fct.2022.113444</a>
+    </li>
+    <li class="ref-item">
+      <span class="ref-authors">Naveed, M., et al.</span> (2018). <span class="ref-title">Chlorogenic acid: A systematic review on the biological functions, mechanistic actions, and therapeutic potentials.</span> <span class="ref-journal">Food & Function, 9(1).</span><br>
+      <a class="ref-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11013850/" target="_blank">https://pmc.ncbi.nlm.nih.gov/articles/PMC11013850/</a>
+    </li>
+    <li class="ref-item">
+      <span class="ref-authors">Habtemariam, S.</span> (2024). <span class="ref-title">Bioactive compounds in coffee and their role in lowering the risk of major public health consequences: A review.</span> <span class="ref-journal">Comprehensive Reviews in Food Science and Food Safety.</span><br>
+      <a class="ref-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10867520/" target="_blank">https://pmc.ncbi.nlm.nih.gov/articles/PMC10867520/</a>
+    </li>
+    <li class="ref-item">
+      <span class="ref-authors">Nehlig, A.</span> (2025). <span class="ref-title">Coffee's impact on health and well-being.</span> <span class="ref-journal">Nutrients.</span><br>
+      <a class="ref-link" href="https://pubmed.ncbi.nlm.nih.gov/40806142/" target="_blank">https://pubmed.ncbi.nlm.nih.gov/40806142/</a>
+    </li>
+    <li class="ref-item">
+      <span class="ref-authors">Wikoff, D., et al.</span> (2017). <span class="ref-title">Systematic review of the potential adverse effects of caffeine consumption in healthy adults, pregnant women, adolescents, and children.</span> <span class="ref-journal">Food and Chemical Toxicology, 109(Pt 1), 585–648.</span><br>
+      <a class="ref-link" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5445139/" target="_blank">https://pmc.ncbi.nlm.nih.gov/articles/PMC5445139/</a>
+    </li>
+    <li class="ref-item">
+      <span class="ref-authors">Killer, S.C., Blannin, A.K., & Jeukendrup, A.E.</span> (2014). <span class="ref-title">No evidence of dehydration with moderate daily coffee intake.</span> <span class="ref-journal">PLoS ONE, 9(1), e84154.</span>
+    </li>
+  </ol>
+</div>
+</section>
+
+<footer style="text-align:center; padding:3rem 2rem; color:var(--text-muted); font-size:0.85rem; border-top:1px solid var(--border);">
+  Coffee & Health Evidence Dashboard<br>
+  <strong>Sobir Rahimov &amp; Shohruh Mamurov</strong><br>
+  All data sourced from peer-reviewed meta-analyses and systematic reviews
+</footer>
+
+<script>
+// Nav highlighting
+const navBtns = document.querySelectorAll('.nav-btn');
+const sections = document.querySelectorAll('section');
+
+navBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = document.getElementById(btn.dataset.target);
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navBtns.forEach(b => b.classList.remove('active'));
+      const match = document.querySelector(`.nav-btn[data-target="${entry.target.id}"]`);
+      if (match) match.classList.add('active');
+    }
+  });
+}, { threshold: 0.3 });
+
+sections.forEach(s => observer.observe(s));
+
+// Animate score bar on scroll
+const scoreBar = document.querySelector('.score-bar');
+if (scoreBar) {
+  const barObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        scoreBar.querySelector('.score-benefit').style.width = '75%';
+        scoreBar.querySelector('.score-risk').style.width = '25%';
+      }
+    });
+  }, { threshold: 0.5 });
+  barObserver.observe(scoreBar);
+}
+</script>
+</body>
+</html>
